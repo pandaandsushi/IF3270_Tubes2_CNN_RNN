@@ -12,8 +12,7 @@ class EmbeddingLayer:
             self.embedding_matrix = np.random.randn(input_dim, output_dim) * 0.01
     
     def forward(self, x):
-        # x is expected to be of shape (batch_size, sequence_length)
-        # and contain integer indices
+        # x = (batch_size, sequence_length)
         return np.take(self.embedding_matrix, x, axis=0)
 
 class DenseLayer:

@@ -31,8 +31,40 @@ class RNN:
             current_dim = hidden_dims[i] * 2
         else:
             current_dim = hidden_dims[i]
-    # def forward(self, x_seq, h0=None):
-    #     pass
+
+    def forward(self, x_sequence):
+        batch_size, seq_length, input_dim = x_sequence.shape
+        layer_input = x_sequence
+
+        for layer in range(self.num_layers):
+            hidden_dim = self.hidden_dims[layer]
+
+            forward_cell = self.forward_cells[layer]
+            outputs = np.zeros((batch_size, seq_length, hidden_dim * 2 if self.bidirectional else hidden_dim))
+
+            # forward
+            h_forward = np.zeros((batch_size, hidden_dim))
+            for t in range(seq_length):
+                h_forward = forward_cell.forward(layer_input[:, t, :], h_forward)
+                if self.bidirectional:
+                    outputs[:, t, :hidden_dim] = h_forward
+                else:
+                    outputs[:, t, :] = h_forward
+
+            # backward
+            if self.bidirectional:
+                backward_cell = self.backward_cells[layer]
+                h_backward = np.zeros((batch_size, hidden_dim))
+                for t in reversed(range(seq_length)):
+                    h_backward = backward_cell.forward(layer_input[:, t, :], h_backward)
+                    outputs[:, t, hidden_dim:] = h_backward  # second half of the output
+
+            # output of current layer becomes input to next
+            layer_input = outputs
+
+        return outputs
+
+
 
     # def backward(self, ...):
     #     pass
