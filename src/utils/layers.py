@@ -2,12 +2,19 @@ from utils.other import ActivationFunction
 import numpy as np
 
 class EmbeddingLayer:
-    def __init__(self, embedding_matrix):
-        self.embedding_matrix = embedding_matrix
-
-    def forward(self, token_ids):
-        return self.embedding_matrix[token_ids]
-
+    def __init__(self, input_dim, output_dim, weights=None):
+        self.input_dim = input_dim
+        self.output_dim = output_dim
+        if weights is not None:
+            self.embedding_matrix = weights
+        else:
+            # just use random if cannot read
+            self.embedding_matrix = np.random.randn(input_dim, output_dim) * 0.01
+    
+    def forward(self, x):
+        # x is expected to be of shape (batch_size, sequence_length)
+        # and contain integer indices
+        return np.take(self.embedding_matrix, x, axis=0)
 
 class DenseLayer:
     def __init__(self, weight, bias, activation='linear'):
