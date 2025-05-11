@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import tensorflow_datasets as tfds
+import os
 
 class DataLoader:
     def __init__(self, dataset):
@@ -18,9 +19,15 @@ class DataLoader:
             return x_train, x_val, x_test, y_train, y_val, y_test
         
         elif self.dataset == 'NusaX':
-            train_df = pd.read_csv('src/utils/NusaX/train.csv')
-            val_df = pd.read_csv('src/utils/NusaX/valid.csv')
-            test_df = pd.read_csv('src/utils/NusaX/test.csv')
+            BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+            base_path = os.path.join(BASE_DIR, 'NusaX')
+            train_df = pd.read_csv(os.path.join(base_path, 'train.csv'))
+            val_df = pd.read_csv(os.path.join(base_path, 'valid.csv'))
+            test_df = pd.read_csv(os.path.join(base_path, 'test.csv'))
+
+            # train_df = pd.read_csv('src/utils/NusaX/train.csv')
+            # val_df = pd.read_csv('src/utils/NusaX/valid.csv')
+            # test_df = pd.read_csv('src/utils/NusaX/test.csv')
 
             x_train = train_df.drop(columns=['label']).values
             y_train = train_df['label'].values 
