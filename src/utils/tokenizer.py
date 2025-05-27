@@ -1,30 +1,43 @@
 import tensorflow as tf
-import pickle
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.preprocessing.sequence import pad_sequences
+import numpy as np
+import pandas as pd
 
-def create_and_save_tokenizer(texts, output_dim=128, save_path='src/utils/tokenizer.pkl'):
-    vectorizer = tf.keras.layers.TextVectorization(
-        max_tokens=None,
-        standardize="lower_and_strip_punctuation",
-        split="whitespace",
-        ngrams=None,
-        output_mode="int",
-        output_sequence_length=None,
-        pad_to_max_tokens=False,
-        vocabulary=None,
-        idf_weights=None,
-        sparse=False,
-        ragged=False,
-        encoding="utf-8",
-        name=None
-    )
-    vectorizer.adapt(texts)
-
-    with open(save_path, 'wb') as f:
-        pickle.dump(vectorizer, f)
+class TextPreprocessor:
+    def __init__(self, max_features=10000, max_length=100):
+        self.max_features = max_features
+        self.max_length = max_length
+        self.tokenizer = None
+        self.text_vectorization = None
+        
+    def create_text_vectorization(self, texts):
+        # Create TextVectorization layer for tokenization
+        self.text_vectorization = tf.keras.layers.TextVectorization(
+            max_tokens=self.max_features,
+            output_sequence_length=self.max_length,
+            output_mode='int'
+        )
+        
+        # Adapt to the texts
+        self.text_vectorization.adapt(texts)
+        
+        return self.text_vectorization
     
-    print(f"Tokenizer saved to {save_path}")
-    return vectorizer
-
-def load_tokenizer(path='src/utils/tokenizer.pkl'):
-    with open(path, 'rb') as f:
-        return pickle.load(f)
+    def preprocess_with_keras(self, texts):
+        # Preprocess texts using Keras TextVectorization
+        if self.text_vectorization is None:
+            self.create_text_vectorization(texts)
+        
+        # Convert texts to vector sequences
+        sequences = self.text_vectorization(texts)
+        
+        return sequences.numpy()
+    
+    def get_vocab_size(self):
+        if self.text_vectorization is not None:
+            return self.text_vectorization.vocabulary_size()
+        elif self.tokenizer is not None:
+            return len(self.tokenizer.word_index) + 1
+        else:
+            return self.max_features

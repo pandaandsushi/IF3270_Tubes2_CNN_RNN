@@ -74,3 +74,23 @@ class RNNCell:
         
     def forward(self, x_t, h_prev):
         return self._activate(np.dot(x_t, self.Wx) + np.dot(h_prev, self.Wh) + self.b)
+    
+class DropoutLayer:
+    def __init__(self, rate=0):
+        self.rate = rate
+        self.mask = None
+        self.is_training = True
+
+    def setrate(self,rate):
+        self.rate = rate
+
+    def setis_training(self,is_training):
+        self.is_training = is_training
+
+    def forward(self, x):
+            if self.is_training and self.rate > 0:
+                self.mask = (np.random.rand(*x.shape) > self.rate).astype(np.float32)
+                return (x * self.mask) / (1.0 - self.rate)
+            return x
+
+    
