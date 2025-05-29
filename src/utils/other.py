@@ -21,7 +21,8 @@ class ActivationFunction:
     
     @staticmethod
     def softmax(x):
-        return np.exp(x) / np.sum(np.exp(x), axis=1, keepdims=True)
+        exp_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+        return exp_x / np.sum(exp_x, axis=1, keepdims=True) 
     
     # Bonus: Swish, softplus, and ELU
     @staticmethod
