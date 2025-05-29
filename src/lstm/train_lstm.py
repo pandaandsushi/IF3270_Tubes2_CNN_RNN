@@ -1,6 +1,7 @@
 import os
 import numpy as np
 from tensorflow import keras
+from sklearn.metrics import classification_report
 from utils.data_loader import DataLoader
 from utils.tokenizer import TextPreprocessor
 from utils.metrics import f1_score_macro, print_classification_report, plot_history
@@ -99,10 +100,15 @@ def main():
     loss, acc = model.evaluate(x_te, y_te, batch_size=BATCH_SIZE, verbose=0)
     y_pred = np.argmax(model.predict(x_te, batch_size=BATCH_SIZE), axis=1)
     f1 = f1_score_macro(y_te, y_pred)
-    print(f"[Keras] Test loss: {loss:.4f}, acc: {acc:.4f}, macro-F1: {f1:.4f}")
+    print(f"[Keras LSTM] Test loss: {loss:.4f}, acc: {acc:.4f}, macro-F1: {f1:.4f}")
 
-    print("\n[Keras] Classification Report:")
+    print("\n[Keras LSTM] Classification Report:")
     print_classification_report(y_te, y_pred)
+
+    report_txt = classification_report(y_te, y_pred, zero_division=0)
+    with open("src/lstm/classification_report_keras_lstm.txt", "w") as f:
+        f.write(report_txt)
+    print("Classification report saved to src/lstm/classification_report_keras_lstm.txt")
 
 if __name__ == "__main__":
     main()
