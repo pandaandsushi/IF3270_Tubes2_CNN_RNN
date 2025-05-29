@@ -19,7 +19,6 @@ DROPOUT_RATE = 0.2
 EPOCHS = 5
 BATCH_SIZE = 32
 
-# --- Load Data ---
 print("Loading NusaX dataset...")
 data_loader = DataLoader(DATASET)
 x_train_raw, x_val_raw, x_test_raw, y_train_raw, y_val_raw, y_test_raw = data_loader.load_data()
@@ -30,16 +29,16 @@ print(f"Validation set: {x_val_raw.shape}, {y_val_raw.shape}")
 print(f"Test set: {x_test_raw.shape}, {y_test_raw.shape}")
 
 # --- Extract text data ---
-# Assuming the first column contains the text data
-x_train_texts = x_train_raw[:, 0].astype(str)
-x_val_texts = x_val_raw[:, 0].astype(str)
-x_test_texts = x_test_raw[:, 0].astype(str)
+x_train_texts = x_train_raw[:, 1].astype(str)
+x_val_texts = x_val_raw[:, 1].astype(str)
+x_test_texts = x_test_raw[:, 1].astype(str)
 
 # Print some examples to verify
 print("\nExample texts from training set:")
 for i in range(min(3, len(x_train_texts))):
     print(f"Text {i+1}: {x_train_texts[i]}")
     print(f"Label: {y_train_raw[i]}")
+    print(f"X TRAIN RAWWWWW: {x_train_raw[i]}")
     print("-" * 50)
 
 # --- Handle string labels ---
@@ -89,10 +88,12 @@ print(f"Processed train shape: {x_train.shape}")
 print(f"Processed validation shape: {x_val.shape}")
 print(f"Processed test shape: {x_test.shape}")
 
-# Print example of processed text
+# Print example
 print("\nExample of processed text (first 20 tokens):")
-print(f"Original: {x_train_texts[0]}")
-print(f"Processed: {x_train[0][:20]}")
+# print(f"Original: {x_train_texts[0]}")
+# print(f"Processed: {x_train[0][:50]}")
+print(f"Original: {x_train_texts[:5]}")
+print(f"Processed: {x_train[:5]}")
 
 # --- Model Training ---
 print("\nInitializing and training model...")
@@ -133,7 +134,7 @@ print(f"Prediction match percentage: {match_percentage:.2f}%")
 # --- Plotting ---
 plt.figure(figsize=(16, 5))
 
-# Plot 1: Training and Validation Loss
+# Training and Validation Loss
 plt.subplot(1, 3, 1)
 plt.plot(history.history['loss'], label='Training Loss', marker='o')
 plt.plot(history.history['val_loss'], label='Validation Loss', marker='x')
@@ -143,7 +144,7 @@ plt.ylabel("Loss")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
-# Plot 2: Training and Validation Accuracy
+# Training and Validation Accuracy
 plt.subplot(1, 3, 2)
 plt.plot(history.history['accuracy'], label='Training Accuracy', marker='o')
 plt.plot(history.history['val_accuracy'], label='Validation Accuracy', marker='x')
@@ -153,26 +154,24 @@ plt.ylabel("Accuracy")
 plt.legend()
 plt.grid(True, alpha=0.3)
 
-# Plot 3: F1 Scores
+# F1 Scores
 plt.subplot(1, 3, 3)
 plt.bar(['Keras Model', 'Scratch RNN'], [f1_keras, f1_scratch], color=['blue', 'orange'])
 plt.title("Macro F1 Score Comparison")
 plt.ylabel("F1 Score")
 plt.grid(True, alpha=0.3, axis='y')
 
-# Add value labels on bars
 for i, v in enumerate([f1_keras, f1_scratch]):
     plt.text(i, v + 0.01, f'{v:.3f}', ha='center', va='bottom')
 
 plt.tight_layout()
-plt.savefig('model_performance.png', dpi=300, bbox_inches='tight')
+plt.savefig('model_performance1.png', dpi=300, bbox_inches='tight')
 plt.show()
 
-print("\nExperiment completed successfully!")
 print("Results saved to 'model_performance.png'")
 
 # Save label encoder for future use
-import pickle
-with open('label_encoder.pkl', 'wb') as f:
-    pickle.dump(label_encoder, f)
-print("Label encoder saved to 'label_encoder.pkl'")
+# import pickle
+# with open('label_encoder.pkl', 'wb') as f:
+#     pickle.dump(label_encoder, f)
+# print("Label encoder saved to 'label_encoder.pkl'")

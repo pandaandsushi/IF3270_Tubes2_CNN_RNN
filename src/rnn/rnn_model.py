@@ -81,24 +81,27 @@ class RNNModel:
         return history
     
     def save_model_weights(self, filepath):
-        weights = {}
-        layer_idx = 0
         if self.keras_model is None:
             raise ValueError("No trained model to save")
         
         self.keras_model.save_weights(filepath)  
         
-        if self.keras_model is None:
-            raise ValueError("No trained model to extract weights from")
+        weights = {}
+        layer_idx = 0
+        
+        print("Extracting weights from Keras model...")
         
         for layer in self.keras_model.layers:
             if isinstance(layer, layers.Embedding):
                 weights['embedding'] = layer.get_weights()[0]
+                print(f"Extracted embedding weights: {weights['embedding'].shape}")
+                
             elif isinstance(layer, (layers.SimpleRNN, layers.Bidirectional)):
                 if isinstance(layer, layers.Bidirectional):
                     # bidirectional RNN
                     forward_weights = layer.forward_layer.get_weights()
                     backward_weights = layer.backward_layer.get_weights()
+                    
                     weights[f'rnn_{layer_idx}_forward'] = {
                         'Wx': forward_weights[0],
                         'Wh': forward_weights[1],
@@ -109,6 +112,11 @@ class RNNModel:
                         'Wh': backward_weights[1],
                         'b': backward_weights[2]
                     }
+                    
+                    print(f"Extracted bidirectional RNN layer {layer_idx} weights:")
+                    print(f"  Forward - Wx: {forward_weights[0].shape}, Wh: {forward_weights[1].shape}, b: {forward_weights[2].shape}")
+                    print(f"  Backward - Wx: {backward_weights[0].shape}, Wh: {backward_weights[1].shape}, b: {backward_weights[2].shape}")
+                    
                 else:
                     # unidirectional RNN
                     layer_weights = layer.get_weights()
@@ -117,69 +125,123 @@ class RNNModel:
                         'Wh': layer_weights[1],
                         'b': layer_weights[2]
                     }
+                    
+                    print(f"Extracted unidirectional RNN layer {layer_idx} weights:")
+                    print(f"  Wx: {layer_weights[0].shape}, Wh: {layer_weights[1].shape}, b: {layer_weights[2].shape}")
+                
                 layer_idx += 1
+                
             elif isinstance(layer, layers.Dense):
                 layer_weights = layer.get_weights()
                 weights['dense'] = {
                     'W': layer_weights[0],
                     'b': layer_weights[1]
                 }
+                print(f"Extracted dense weights: W: {layer_weights[0].shape}, b: {layer_weights[1].shape}")
         
         self.model_weights = weights
+        print("Weight extraction completed!")
 
     def rnn_scratch(self, rnn_layers, rnn_units, bidirectional=False):
         if not self.model_weights:
             raise ValueError("No weights available. Train a model first.")
         
+        print("Building from-scratch model...")
+        
+        # Initialize embedding layer
         self.embedding = EmbeddingLayer(
             input_dim=self.vocab_size,
             output_dim=self.embedding_dim,
             weights=self.model_weights['embedding']
         )
+        print(f"Embedding layer initialized with shape: {self.model_weights['embedding'].shape}")
         
+        # Initialize RNN layer
         self.rnn = RNNLayer(
             input_dim=self.embedding_dim,
             hidden_dims=rnn_units,
             bidirectional=bidirectional
         )
+        print(f"RNN layer initialized: {rnn_layers} layers, units: {rnn_units}, bidirectional: {bidirectional}")
         
-        # Set RNN weights
+        # Set RNN weights from trained model
         for i in range(rnn_layers):
+            print(f"Setting weights for RNN layer {i}...")
+            
             if bidirectional:
+                # Check if forward weights exist
                 if f'rnn_{i}_forward' in self.model_weights:
                     forward_weights = self.model_weights[f'rnn_{i}_forward']
                     self.rnn.forward_cells[i].Wx = forward_weights['Wx']
                     self.rnn.forward_cells[i].Wh = forward_weights['Wh']
                     self.rnn.forward_cells[i].b = forward_weights['b']
+                    print(f"  Forward weights set for layer {i}")
+                else:
+                    print(f"  Warning: Forward weights not found for layer {i}")
                 
+                # Check if backward weights exist
                 if f'rnn_{i}_backward' in self.model_weights:
                     backward_weights = self.model_weights[f'rnn_{i}_backward']
-                    self.rnn.backward_cells[i].Wx = backward_weights['Wx']
-                    self.rnn.backward_cells[i].Wh = backward_weights['Wh']
-                    self.rnn.backward_cells[i].b = backward_weights['b']
+                    if i < len(self.rnn.backward_cells):
+                        self.rnn.backward_cells[i].Wx = backward_weights['Wx']
+                        self.rnn.backward_cells[i].Wh = backward_weights['Wh']
+                        self.rnn.backward_cells[i].b = backward_weights['b']
+                        print(f"  Backward weights set for layer {i}")
+                    else:
+                        print(f"  Error: Backward cell {i} not found in RNN layer")
+                else:
+                    print(f"  Warning: Backward weights not found for layer {i}")
             else:
+                # Unidirectional RNN
                 if f'rnn_{i}' in self.model_weights:
                     rnn_weights = self.model_weights[f'rnn_{i}']
                     self.rnn.forward_cells[i].Wx = rnn_weights['Wx']
                     self.rnn.forward_cells[i].Wh = rnn_weights['Wh']
                     self.rnn.forward_cells[i].b = rnn_weights['b']
+                    print(f"  Unidirectional weights set for layer {i}")
+                else:
+                    print(f"  Warning: Weights not found for layer {i}")
         
+        # Initialize dropout layer (no dropout during inference)
         self.dropout = DropoutLayer(rate=0.0)
+        
+        # Initialize dense layer
         dense_weights = self.model_weights['dense']
         self.dense = DenseLayer(
             weight=dense_weights['W'],
             bias=dense_weights['b'],
-            activation='softmax')
+            activation='softmax'
+        )
+        print(f"Dense layer initialized with shape: W: {dense_weights['W'].shape}, b: {dense_weights['b'].shape}")
+        
+        print("From-scratch model built successfully!")
         
     def predict_scratch(self, x):
         if self.embedding is None:
             raise ValueError("From-scratch model not built")
+        
+        print(f"Running from-scratch prediction on {x.shape[0]} samples...")
+        
+        # Embedding
         embedded = self.embedding.forward(x)
+        print(f"After embedding: {embedded.shape}")
+        
+        # RNN
         rnn_output = self.rnn.forward(embedded)
+        print(f"After RNN: {rnn_output.shape}")
+        
         # Take last timestep output
         last_output = rnn_output[:, -1, :]
+        print(f"After taking last timestep: {last_output.shape}")
+        
+        # Dropout (no effect during inference)
         dropout_output = self.dropout.forward(last_output)
+        print(f"After dropout: {dropout_output.shape}")
+        
+        # Dense layer
         predictions = self.dense.forward(dropout_output)
+        print(f"Final predictions: {predictions.shape}")
+        
         return predictions
     
     def evaluate_model(self, x_test, y_test, model_type='keras'):
