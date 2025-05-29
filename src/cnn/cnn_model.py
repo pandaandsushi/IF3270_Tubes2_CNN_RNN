@@ -12,8 +12,8 @@ class Conv2D:
         self.activation = activation
         self.kernel_init = kernel_init
         self.bias_init = bias_init
-        self.kernel = self.init_kernel()
-        self.bias = self.init_bias()
+        self.kernel = None
+        self.bias = None 
 
     def init_kernel(self):
         if self.kernel_init == 'he':
@@ -34,6 +34,12 @@ class Conv2D:
         return X
     
     def forward(self, X):
+        # inisialisasi bobot kernel dan bias
+        if self.kernel is None:
+            input_channels = X.shape[-1]
+            self.kernel = self.init_kernel(input_channels)
+            self.bias = self.init_bias()
+
         X = self.pad_input(X)
         batch_size, H, W, C = X.shape
         F, _, _, K = self.kernel.shape
@@ -101,13 +107,13 @@ class Pooling:
         elif self.pool_type == 'avg':
             return self.avg_pool(X)
         
-# class Flatten:
-#     def __init__(self):
-#         pass
+class Flatten:
+    def __init__(self):
+        pass
 
-#     def forward(self, X):
-#         batch_size, _, _, _ = X.shape
-#         return X.reshape(batch_size, -1) 
+    def forward(self, X):
+        batch_size, _, _, _ = X.shape
+        return X.reshape(batch_size, -1) 
     
 # X = np.random.randn(2, 28, 28, 3)
 
