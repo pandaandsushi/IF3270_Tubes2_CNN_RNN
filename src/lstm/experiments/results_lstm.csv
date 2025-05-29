@@ -1,0 +1,10 @@
+config,layers,units,bidirectional,epochs_trained,loss,accuracy,macro_f1,model_path,curve_path,report_path
+L1_U64_B0,1,64,0,15,1.1204382181167603,0.3824999928474426,0.1844484629294756,src\lstm\experiments\model_L1_U64_B0.keras,src\lstm\experiments\history_L1_U64_B0.png,src\lstm\experiments\class_report_L1_U64_B0.txt
+L2_U64-32_B0,2,64-32,0,15,1.1226922273635864,0.3824999928474426,0.1844484629294756,src\lstm\experiments\model_L2_U64-32_B0.keras,src\lstm\experiments\history_L2_U64-32_B0.png,src\lstm\experiments\class_report_L2_U64-32_B0.txt
+L2_U32-16_B0,2,32-16,0,15,1.1371560096740723,0.3824999928474426,0.1844484629294756,src\lstm\experiments\model_L2_U32-16_B0.keras,src\lstm\experiments\history_L2_U32-16_B0.png,src\lstm\experiments\class_report_L2_U32-16_B0.txt
+L1_U64_B1,1,64,1,15,1.1028060913085938,0.3824999928474426,0.1844484629294756,src\lstm\experiments\model_L1_U64_B1.keras,src\lstm\experiments\history_L1_U64_B1.png,src\lstm\experiments\class_report_L1_U64_B1.txt
+L3_U64-32-16_B0,3,64-32-16,0,15,1.136407732963562,0.3774999976158142,0.18269812462189958,src\lstm\experiments\model_L3_U64-32-16_B0.keras,src\lstm\experiments\history_L3_U64-32-16_B0.png,src\lstm\experiments\class_report_L3_U64-32-16_B0.txt
+L2_U32-32_B0,2,32-32,0,15,1.124680995941162,0.3774999976158142,0.18269812462189958,src\lstm\experiments\model_L2_U32-32_B0.keras,src\lstm\experiments\history_L2_U32-32_B0.png,src\lstm\experiments\class_report_L2_U32-32_B0.txt
+L2_U128-64_B0,2,128-64,0,15,1.1114871501922607,0.3774999976158142,0.18269812462189958,src\lstm\experiments\model_L2_U128-64_B0.keras,src\lstm\experiments\history_L2_U128-64_B0.png,src\lstm\experiments\class_report_L2_U128-64_B0.txt
+L2_U64-64_B0,2,64-64,0,15,1.1142022609710693,0.23999999463558197,0.12903225806451613,src\lstm\experiments\model_L2_U64-64_B0.keras,src\lstm\experiments\history_L2_U64-64_B0.png,src\lstm\experiments\class_report_L2_U64-64_B0.txt
+L2_U32-16_B1,2,32-16,1,15,1.1456360816955566,0.23999999463558197,0.12903225806451613,src\lstm\experiments\model_L2_U32-16_B1.keras,src\lstm\experiments\history_L2_U32-16_B1.png,src\lstm\experiments\class_report_L2_U32-16_B1.txt
