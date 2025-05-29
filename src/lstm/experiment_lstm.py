@@ -52,9 +52,9 @@ print("Loading NusaX dataset...")
 loader = DataLoader(DATASET)
 x_tr_raw, x_val_raw, x_te_raw, y_tr, y_val, y_te = loader.load_data()
 
-x_tr_txt = x_tr_raw[:, 0].astype(str)
-x_val_txt = x_val_raw[:, 0].astype(str)
-x_te_txt = x_te_raw[:, 0].astype(str)
+x_tr_txt = x_tr_raw[:, 1].astype(str)
+x_val_txt = x_val_raw[:, 1].astype(str)
+x_te_txt = x_te_raw[:, 1].astype(str)
 
 if y_tr.dtype == 'object' or y_tr.dtype.kind in {'U', 'S'}:
     print("Converting string labels to numeric...")

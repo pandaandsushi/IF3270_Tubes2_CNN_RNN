@@ -1,20 +1,21 @@
 Experiment Configuration: L1_U64_B1
+Seed: 49
 Layers: 1
 Units: [64]
 Bidirectional: True
-Epochs trained: 15
+Epochs trained: 13
 Final Results:
-Loss: 1.1028
-Accuracy: 0.3825
-Macro F1: 0.1844
+Loss: 0.9829
+Accuracy: 0.7025
+Macro F1: 0.6863
 
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.38      1.00      0.55       153
-           1       0.00      0.00      0.00        96
-           2       0.00      0.00      0.00       151
+           0       0.63      0.73      0.67       153
+           1       0.66      0.52      0.58        96
+           2       0.81      0.79      0.80       151
 
-    accuracy                           0.38       400
-   macro avg       0.13      0.33      0.18       400
-weighted avg       0.15      0.38      0.21       400
+    accuracy                           0.70       400
+   macro avg       0.70      0.68      0.69       400
+weighted avg       0.71      0.70      0.70       400

@@ -23,9 +23,9 @@ random.seed(SEED)
 DATASET       = "NusaX"
 EMBEDDING_DIM = 64
 MAX_LENGTH    = 100
-LSTM_LAYERS   = 2
-LSTM_UNITS    = [32, 16]
-BIDIRECTIONAL = False
+LSTM_LAYERS   = 1
+LSTM_UNITS    = [64]
+BIDIRECTIONAL = True
 DROPOUT_RATE  = 0.5
 EPOCHS        = 15
 BATCH_SIZE    = 32
@@ -109,9 +109,9 @@ def main():
     x_tr_raw, x_val_raw, x_te_raw, y_tr, y_val, y_te = loader.load_data()
 
     # extract text data
-    x_tr_txt = x_tr_raw[:, 0].astype(str)
-    x_val_txt= x_val_raw[:, 0].astype(str)
-    x_te_txt = x_te_raw[:, 0].astype(str)
+    x_tr_txt = x_tr_raw[:, 1].astype(str)
+    x_val_txt= x_val_raw[:, 1].astype(str)
+    x_te_txt = x_te_raw[:, 1].astype(str)
 
     # convert labels to numeric if they are strings
     if y_tr.dtype == 'object' or y_tr.dtype.kind in {'U', 'S'}:
