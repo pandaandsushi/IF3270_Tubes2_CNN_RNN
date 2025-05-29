@@ -10,6 +10,13 @@ from utils.layers import EmbeddingLayer, LSTMCell, DenseLayer
 from utils.metrics import f1_score_macro, print_classification_report
 from utils.data_loader import DataLoader
 from utils.tokenizer import TextPreprocessor
+import random
+
+# Set seeds
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+random.seed(SEED)
 
 # Configuration
 DATASET       = "NusaX"
@@ -115,6 +122,8 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
     """
     Perform forward propagation through the custom LSTM model.
     """
+    np.random.seed(SEED)
+    
     N, seq_len = X.shape
     H = emb.forward(X)
     

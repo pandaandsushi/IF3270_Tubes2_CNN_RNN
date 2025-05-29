@@ -3,6 +3,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
+import tensorflow as tf
 from tensorflow import keras
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
@@ -10,6 +11,13 @@ from sklearn.utils.class_weight import compute_class_weight
 from utils.data_loader import DataLoader
 from utils.tokenizer import TextPreprocessor
 from utils.metrics import f1_score_macro, print_classification_report, plot_history
+import random
+
+# Set seeds for reproducibility
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+random.seed(SEED)
 
 # Hyperparameter configuration
 DATASET       = "NusaX"
@@ -35,10 +43,11 @@ def build_lstm_model(vocab_size, num_classes):
             input_dim=vocab_size,
             output_dim=EMBEDDING_DIM,
             mask_zero=True,
-            name="embedding"
+            name="embedding",
+            embeddings_initializer=keras.initializers.RandomUniform(seed=SEED)
         )(inputs)
     
-    x = keras.layers.Dropout(0.3)(x)
+    x = keras.layers.Dropout(0.3, seed=SEED)(x)
     
     # lstm layers
     for i, units in enumerate(LSTM_UNITS):
@@ -50,7 +59,9 @@ def build_lstm_model(vocab_size, num_classes):
                         return_sequences=return_seq,
                         dropout=0.3,
                         recurrent_dropout=0.3,
-                        kernel_regularizer=keras.regularizers.l2(0.01)
+                        kernel_regularizer=keras.regularizers.l2(0.01),
+                        kernel_initializer=keras.initializers.GlorotUniform(seed=SEED),
+                        recurrent_initializer=keras.initializers.Orthogonal(seed=SEED)
                     ),
                     name=f"bidi_lstm_{i+1}"
                 )(x)
@@ -61,20 +72,24 @@ def build_lstm_model(vocab_size, num_classes):
                     dropout=0.3,
                     recurrent_dropout=0.3,
                     kernel_regularizer=keras.regularizers.l2(0.01),
-                    name=f"lstm_{i+1}"
+                    name=f"lstm_{i+1}",
+                    kernel_initializer=keras.initializers.GlorotUniform(seed=SEED),
+                    recurrent_initializer=keras.initializers.Orthogonal(seed=SEED)
                 )(x)
         
-        x = keras.layers.Dropout(0.4)(x)
+        x = keras.layers.Dropout(0.4, seed=SEED)(x)
     
     x = keras.layers.Dense(32, activation='relu', 
-                          kernel_regularizer=keras.regularizers.l2(0.01))(x)
-    x = keras.layers.Dropout(DROPOUT_RATE)(x)
+                          kernel_regularizer=keras.regularizers.l2(0.01),
+                          kernel_initializer=keras.initializers.GlorotUniform(seed=SEED))(x)
+    x = keras.layers.Dropout(DROPOUT_RATE, seed=SEED)(x)
     
     # output layer
     outputs = keras.layers.Dense(
                   num_classes,
                   activation="softmax",
-                  name="output_softmax"
+                  name="output_softmax",
+                  kernel_initializer=keras.initializers.GlorotUniform(seed=SEED)
               )(x)
     
     optimizer = keras.optimizers.Adam(learning_rate=LEARNING_RATE)
