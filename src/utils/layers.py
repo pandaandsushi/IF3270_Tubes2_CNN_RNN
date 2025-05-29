@@ -74,7 +74,50 @@ class RNNCell:
         
     def forward(self, x_t, h_prev):
         return self._activate(np.dot(x_t, self.Wx) + np.dot(h_prev, self.Wh) + self.b)
-    
+
+class LSTMCell:
+    """
+    Represents a single LSTM cell. 
+    Takes input x_t, h_prev, and c_prev, 
+    and outputs h_t and c_t.
+    """
+    def __init__(self, Wi, Wf, Wo, Wc,
+                       Ui, Uf, Uo, Uc,
+                       bi, bf, bo, bc):
+        # init weights and biases
+        self.Wi, self.Wf, self.Wo, self.Wc = Wi, Wf, Wo, Wc
+        self.Ui, self.Uf, self.Uo, self.Uc = Ui, Uf, Uo, Uc
+        self.bi, self.bf, self.bo, self.bc = bi, bf, bo, bc
+
+    def forward(self, x_t, h_prev, c_prev):
+        # input gate
+        i_t = ActivationFunction.sigmoid(
+            np.dot(x_t, self.Wi) + np.dot(h_prev, self.Ui) + self.bi
+        )
+        
+        # forget gate
+        f_t = ActivationFunction.sigmoid(
+            np.dot(x_t, self.Wf) + np.dot(h_prev, self.Uf) + self.bf
+        )
+        
+        # output gate
+        o_t = ActivationFunction.sigmoid(
+            np.dot(x_t, self.Wo) + np.dot(h_prev, self.Uo) + self.bo
+        )
+        
+        # candidate cell state
+        c_hat_t = ActivationFunction.tanh(
+            np.dot(x_t, self.Wc) + np.dot(h_prev, self.Uc) + self.bc
+        )
+
+        # new cell state
+        c_t = f_t * c_prev + i_t * c_hat_t
+        
+        # new hidden state
+        h_t = o_t * ActivationFunction.tanh(c_t)
+
+        return h_t, c_t
+
 class DropoutLayer:
     def __init__(self, rate=0):
         self.rate = rate
