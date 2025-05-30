@@ -1,4 +1,4 @@
-from cnn_model import Conv2D, Flatten, Pooling
+from cnn_model import Conv2D, Flatten, Pooling, CNNModel
 import tensorflow as tf
 from tensorflow import keras
 from utils.layers import DenseLayer
@@ -6,102 +6,7 @@ from utils.data_loader import DataLoader
 from sklearn.metrics import f1_score
 import numpy as np
 
-class CNNModel:
-    def __init__(self):
-        self.layers = []
-    
-    def add_layer(self, layer):
-        self.layers.append(layer)
-    
-    def load_keras_model(self, keras_model):
-        self.layers = []
-                
-        for i, keras_layer in enumerate(keras_model.layers):
-            layer_name = keras_layer.name
-            layer_type = type(keras_layer).__name__
-            print(f"  Layer {i+1}: {layer_type} ({layer_name})")
-            
-            if isinstance(keras_layer, tf.keras.layers.Conv2D):
-                config = keras_layer.get_config()
-                conv_layer = Conv2D(
-                    filters=config['filters'],
-                    kernel_size=config['kernel_size'][0],
-                    strides=config['strides'][0],
-                    padding=config['padding'],
-                    activation=config['activation']
-                )
-                
-                weights, bias = keras_layer.get_weights()
-                conv_layer.set_weights(weights, bias)
-                self.add_layer(conv_layer)
-                print(f"    → Conv2D: {config['filters']} filters, {config['kernel_size']}x{config['kernel_size']} kernel")
-                
-            elif isinstance(keras_layer, tf.keras.layers.MaxPooling2D):
-                config = keras_layer.get_config()
-                pool_layer = Pooling(
-                    pool_type='max',
-                    pool_size=config['pool_size'][0],
-                    strides=config['strides'][0],
-                    padding=config['padding']
-                )
-                self.add_layer(pool_layer)
-                print(f"    → MaxPooling2D: {config['pool_size']}x{config['pool_size']} pool")
-                
-            elif isinstance(keras_layer, tf.keras.layers.AveragePooling2D):
-                config = keras_layer.get_config()
-                pool_layer = Pooling(
-                    pool_type='avg',
-                    pool_size=config['pool_size'][0],
-                    strides=config['strides'][0],
-                    padding=config['padding']
-                )
-                self.add_layer(pool_layer)
-                print(f"    → AveragePooling2D: {config['pool_size']}x{config['pool_size']} pool")
-                
-            elif isinstance(keras_layer, tf.keras.layers.Flatten):
-                flatten_layer = Flatten()
-                self.add_layer(flatten_layer)
-                print(f"    → Flatten")
-                
-            elif isinstance(keras_layer, tf.keras.layers.Dense):
-                config = keras_layer.get_config()
-                weights, bias = keras_layer.get_weights()
-                
-                dense_layer = DenseLayer(
-                    weight=weights,
-                    bias=bias,
-                    activation=config['activation']
-                )
-                self.add_layer(dense_layer)
-                print(f"    → Dense: {config['units']} units, {config['activation']} activation")
-        
-        print(f"✓ Model loaded with {len(self.layers)} layers")
-    
-    def forward(self, X):
-        output = X
-        for i, layer in enumerate(self.layers):
-            output = layer.forward(output)
-        return output
-    
-    def predict(self, X, batch_size=32):
-        n_samples = X.shape[0]
-        predictions = []
-        
-        print(f"Predicting {n_samples} samples in batches of {batch_size}...")
-        
-        for i in range(0, n_samples, batch_size):
-            batch_end = min(i + batch_size, n_samples)
-            batch = X[i:batch_end]
-            
-            if i % (batch_size * 10) == 0:
-                print(f"  Processing batch {i//batch_size + 1}/{(n_samples-1)//batch_size + 1}")
-            
-            batch_pred = self.forward(batch)
-            predictions.append(batch_pred)
-        
-        return np.vstack(predictions)
-
-class CNNValidator:
+class CNNTester:
     def __init__(self):
         self.data_loader = DataLoader('cifar10')
         _, _, self.x_test, _, _, self.y_test = self.data_loader.load_data()
@@ -292,7 +197,7 @@ def quick_test():
     
     # Test implementation
     print("Testing implementation...")
-    validator = CNNValidator()
+    validator = CNNTester()
     
     # Use small subset for quick test
     x_test_small = validator.x_test[:50]
@@ -337,7 +242,7 @@ def main():
     print("="*80)
     
     # Full validation
-    validator = CNNValidator()
+    validator = CNNTester()
     results = validator.validate_all_models(test_samples=1000)
     
     print(f"\n{'='*80}")
