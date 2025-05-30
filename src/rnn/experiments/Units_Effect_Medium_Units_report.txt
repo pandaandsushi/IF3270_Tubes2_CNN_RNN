@@ -1,0 +1,26 @@
+Experiment: Units_Effect - Medium_Units
+Configuration:
+  Layers: 2
+  Units: [64, 32]
+  Bidirectional: True
+  Epochs: 10
+  Batch Size: 32
+  Dropout Rate: 0.2
+
+Results:
+  Test F1 Score: 0.4642
+  Final Train Loss: 0.0059
+  Final Val Loss: 1.2139
+  Final Train Acc: 1.0000
+  Final Val Acc: 0.5700
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.40      0.46      0.43       153
+           1       0.37      0.45      0.40        96
+           2       0.66      0.48      0.56       151
+
+    accuracy                           0.47       400
+   macro avg       0.48      0.46      0.46       400
+weighted avg       0.49      0.47      0.47       400

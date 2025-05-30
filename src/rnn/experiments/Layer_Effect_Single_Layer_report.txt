@@ -1,0 +1,26 @@
+Experiment: Layer_Effect - Single_Layer
+Configuration:
+  Layers: 1
+  Units: [64]
+  Bidirectional: True
+  Epochs: 10
+  Batch Size: 32
+  Dropout Rate: 0.2
+
+Results:
+  Test F1 Score: 0.5453
+  Final Train Loss: 0.0136
+  Final Val Loss: 1.0736
+  Final Train Acc: 1.0000
+  Final Val Acc: 0.5400
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.57      0.54      0.55       153
+           1       0.41      0.35      0.38        96
+           2       0.66      0.75      0.70       151
+
+    accuracy                           0.57       400
+   macro avg       0.55      0.55      0.55       400
+weighted avg       0.56      0.57      0.57       400

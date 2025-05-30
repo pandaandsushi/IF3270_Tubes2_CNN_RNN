@@ -18,7 +18,7 @@ EMBEDDING_DIM = 100
 MAX_LENGTH = 100
 RNN_LAYERS = 2
 RNN_UNITS = [64, 32]
-BIDIRECTIONAL = True
+BIDIRECTIONAL = False
 DROPOUT_RATE = 0.2
 EPOCHS = 5
 BATCH_SIZE = 32
@@ -92,12 +92,6 @@ print(f"Processed train shape: {x_train.shape}")
 print(f"Processed validation shape: {x_val.shape}")
 print(f"Processed test shape: {x_test.shape}")
 
-# Print example
-print("\nExample of processed text (first 20 tokens):")
-# print(f"Original: {x_train_texts[0]}")
-# print(f"Processed: {x_train[0][:50]}")
-print(f"Original: {x_train_texts[:5]}")
-print(f"Processed: {x_train[:5]}")
 
 # --- Model Training ---
 print("\nInitializing and training model...")
@@ -140,6 +134,13 @@ from sklearn.metrics import classification_report
 
 report_path = "src/rnn/experiments/classification_report_rnn.txt"
 with open(report_path, "w") as f:
+    f.write(f"EMBEDDING_DIM: {EMBEDDING_DIM}\n")
+    f.write(f"MAX_LENGTH: {MAX_LENGTH}\n")
+    f.write(f"LSTM_UNITS: {RNN_UNITS}\n")
+    f.write(f"BIDIRECTIONAL: {BIDIRECTIONAL}\n")
+    f.write(f"DROPOUT_RATE: {DROPOUT_RATE}\n")
+    f.write(f"EPOCHS: {EPOCHS}\n")
+    f.write(f"VOCAB_SIZE: {vocab_size}\n")
     f.write("=== RNN Model Evaluation Report ===\n")
     f.write(f"F1 Score (Keras): {f1_keras:.4f}\n")
     f.write(f"F1 Score (Scratch): {f1_scratch:.4f}\n")
@@ -175,11 +176,11 @@ plt.legend()
 plt.grid(True, alpha=0.3)
 
 # F1 Scores
-plt.subplot(1, 3, 3)
-plt.bar(['Keras Model', 'Scratch RNN'], [f1_keras, f1_scratch], color=['blue', 'orange'])
-plt.title("Macro F1 Score Comparison")
-plt.ylabel("F1 Score")
-plt.grid(True, alpha=0.3, axis='y')
+# plt.subplot(1, 3, 3)
+# plt.bar(['Keras Model', 'Scratch RNN'], [f1_keras, f1_scratch], color=['blue', 'orange'])
+# plt.title("Macro F1 Score Comparison")
+# plt.ylabel("F1 Score")
+# plt.grid(True, alpha=0.3, axis='y')
 
 for i, v in enumerate([f1_keras, f1_scratch]):
     plt.text(i, v + 0.01, f'{v:.3f}', ha='center', va='bottom')

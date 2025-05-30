@@ -1,27 +1,27 @@
 === RNN Model Evaluation Report ===
-F1 Score (Keras): 0.5330
-F1 Score (Scratch): 0.5330
+F1 Score (Keras): 0.3785
+F1 Score (Scratch): 0.3785
 Prediction Match: 100.00%
 
 === Classification Report (Keras) ===
               precision    recall  f1-score   support
 
-           0       0.45      0.50      0.48       153
-           1       0.56      0.43      0.49        96
-           2       0.63      0.65      0.64       151
+           0       0.41      0.31      0.36       153
+           1       0.27      0.33      0.30        96
+           2       0.46      0.50      0.48       151
 
-    accuracy                           0.54       400
-   macro avg       0.55      0.53      0.53       400
-weighted avg       0.54      0.54      0.54       400
+    accuracy                           0.39       400
+   macro avg       0.38      0.38      0.38       400
+weighted avg       0.40      0.39      0.39       400
 
 
 === Classification Report (Scratch) ===
               precision    recall  f1-score   support
 
-           0       0.45      0.50      0.48       153
-           1       0.56      0.43      0.49        96
-           2       0.63      0.65      0.64       151
+           0       0.41      0.31      0.36       153
+           1       0.27      0.33      0.30        96
+           2       0.46      0.50      0.48       151
 
-    accuracy                           0.54       400
-   macro avg       0.55      0.53      0.53       400
-weighted avg       0.54      0.54      0.54       400
+    accuracy                           0.39       400
+   macro avg       0.38      0.38      0.38       400
+weighted avg       0.40      0.39      0.39       400

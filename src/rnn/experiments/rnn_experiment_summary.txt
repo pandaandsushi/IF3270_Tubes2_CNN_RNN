@@ -1,0 +1,49 @@
+RNN HYPERPARAMETER EXPERIMENT SUMMARY
+==================================================
+
+1. PENGARUH JUMLAH LAYER RNN
+------------------------------
+  Single_Layer: F1=0.5453, Layers=1, Val_Loss=1.0736
+  Two_Layers: F1=0.4888, Layers=2, Val_Loss=1.0926
+  Three_Layers: F1=0.4591, Layers=3, Val_Loss=1.4934
+
+KESIMPULAN LAYER EFFECT:
+- Konfigurasi terbaik: Single_Layer dengan 1 layer (F1: 0.5453)
+- Konfigurasi terburuk: Three_Layers dengan 3 layer (F1: 0.4591)
+- Selisih performa: 0.0861
+- Model dengan 1 layer memberikan performa terbaik, menunjukkan bahwa data tidak memerlukan representasi yang sangat kompleks
+
+2. PENGARUH BANYAK CELL RNN PER LAYER
+-----------------------------------
+  Small_Units: F1=0.5580, Units=[32, 16], Val_Loss=1.0507
+  Medium_Units: F1=0.4642, Units=[64, 32], Val_Loss=1.2139
+  Large_Units: F1=0.4068, Units=[128, 64], Val_Loss=1.6234
+
+KESIMPULAN UNITS EFFECT:
+- Konfigurasi terbaik: Small_Units dengan units [32, 16] (F1: 0.5580)
+- Konfigurasi terburuk: Large_Units dengan units [128, 64] (F1: 0.4068)
+- Selisih performa: 0.1512
+- Unit yang lebih kecil memberikan performa terbaik, menunjukkan model tidak memerlukan kapasitas yang besar
+
+3. PENGARUH ARAH RNN (BIDIRECTIONAL VS UNIDIRECTIONAL)
+--------------------------------------------------
+  Unidirectional: F1=0.5551, Val_Loss=1.3630
+  Bidirectional: F1=0.5343, Val_Loss=1.2356
+
+KESIMPULAN DIRECTION EFFECT:
+- Konfigurasi terbaik: Unidirectional (F1: 0.5551)
+- Konfigurasi terburuk: Bidirectional (F1: 0.5343)
+- Selisih performa: 0.0208
+- Unidirectional RNN memberikan performa lebih baik, mungkin karena data memiliki struktur sekuensial yang kuat
+- Model lebih sederhana dan tidak mengalami overfitting
+
+4. KONFIGURASI TERBAIK SECARA KESELURUHAN
+----------------------------------------
+Experiment Type: Units_Effect
+Configuration: Small_Units
+Layers: 2
+Units: [32, 16]
+Bidirectional: True
+F1 Score: 0.5580
+Final Validation Loss: 1.0507
+Final Validation Accuracy: 0.6000
