@@ -22,9 +22,9 @@ class CNNTester:
         # Load Keras model
         try:
             keras_model = keras.models.load_model(model_path)
-            print(f"✓ Keras model loaded: {model_path}")
+            print(f"Keras model loaded: {model_path}")
         except Exception as e:
-            print(f"✗ Failed to load Keras model: {e}")
+            print(f"Failed to load Keras model: {e}")
             return None
         
         # Print model summary
@@ -84,13 +84,13 @@ class CNNTester:
         # Validation status
         tolerance = 1e-6
         if mse_diff < tolerance and identical_predictions:
-            print("✅ VALIDATION PASSED - Implementation is CORRECT!")
+            print("VALIDATION PASSED - Implementation is CORRECT!")
             status = "PASS"
-        elif mse_diff < 1e-4:  # More lenient tolerance
-            print("⚠️  VALIDATION PASSED with small differences - Implementation is mostly correct")
+        elif mse_diff < 1e-4:
+            print("VALIDATION PASSED with small differences - Implementation is mostly correct")
             status = "PASS"
         else:
-            print("❌ VALIDATION FAILED - Implementation needs debugging!")
+            print("VALIDATION FAILED - Implementation needs debugging!")
             status = "FAIL"
         
         return {
@@ -113,7 +113,7 @@ class CNNTester:
         model_files = [f for f in os.listdir('.') if f.endswith('.h5')]
         
         if not model_files:
-            print("❌ No .h5 model files found!")
+            print("No .h5 model files found!")
             print("Please run the training script first: python complete_cnn_implementation.py")
             return {}
         
@@ -128,7 +128,7 @@ class CNNTester:
                 if result:
                     results[model_file] = result
             except Exception as e:
-                print(f"❌ Error validating {model_file}: {e}")
+                print(f"Error validating {model_file}: {e}")
                 import traceback
                 traceback.print_exc()
         
@@ -142,33 +142,31 @@ class CNNTester:
         print(f"{'#'*80}")
         
         if not results:
-            print("❌ No successful validations.")
+            print("No successful validations.")
             return
         
         passed = sum(1 for r in results.values() if r['status'] == 'PASS')
         total = len(results)
         
-        print(f"📊 OVERALL RESULTS:")
+        print(f"OVERALL RESULTS:")
         print(f"   Total models tested: {total}")
         print(f"   Passed validation: {passed}")
         print(f"   Failed validation: {total - passed}")
         print(f"   Success rate: {passed/total*100:.1f}%")
         
-        print(f"\n📋 DETAILED RESULTS:")
+        print(f"\nDETAILED RESULTS:")
         for model_name, result in results.items():
-            status_icon = "✅" if result['status'] == 'PASS' else "❌"
-            print(f"{status_icon} {model_name}:")
+            print(f"{model_name}:")
             print(f"    MSE difference: {result['mse_diff']:.2e}")
             print(f"    Max difference: {result['max_diff']:.2e}")
             print(f"    F1 difference: {abs(result['keras_f1'] - result['scratch_f1']):.8f}")
             print(f"    Identical predictions: {result['identical']}")
         
         if passed == total:
-            print(f"\n🎉 CONGRATULATIONS!")
             print(f"   All models passed validation!")
-            print(f"   Your CNN from-scratch implementation is CORRECT! ✅")
+            print(f"   CNN from-scratch implementation is CORRECT!")
         else:
-            print(f"\n⚠️  Some models failed validation.")
+            print(f"\nSome models failed validation.")
             print(f"   Please check the implementation for debugging.")
 
 def quick_test():
@@ -217,10 +215,10 @@ def quick_test():
     print(f"Max difference: {max_diff:.10f}")
     
     if mse_diff < 1e-6:
-        print("✅ Quick test PASSED!")
+        print("Quick test PASSED!")
         return True
     else:
-        print("❌ Quick test FAILED!")
+        print("Quick test FAILED!")
         return False
 
 def main():
@@ -231,7 +229,7 @@ def main():
     # Quick test first
     print("Running quick test...")
     if not quick_test():
-        print("❌ Quick test failed. Please check implementation.")
+        print("Quick test failed. Please check implementation.")
         return
     
     print("\n" + "="*80)
