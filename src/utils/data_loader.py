@@ -25,10 +25,6 @@ class DataLoader:
             val_df = pd.read_csv(os.path.join(base_path, 'valid.csv'))
             test_df = pd.read_csv(os.path.join(base_path, 'test.csv'))
 
-            # train_df = pd.read_csv('src/utils/NusaX/train.csv')
-            # val_df = pd.read_csv('src/utils/NusaX/valid.csv')
-            # test_df = pd.read_csv('src/utils/NusaX/test.csv')
-
             x_train = train_df.drop(columns=['label']).values
             y_train = train_df['label'].values 
             x_val = val_df.drop(columns=['label']).values
@@ -50,14 +46,3 @@ class DataLoader:
 
         return x, y
     
-
-# ds =  DataLoader('NusaX')
-
-# a, b, c, d, e, f = ds.load_data()
-
-# print(a[0])
-# print(b[0])
-# print(c[0])
-# print(d[0])
-# print(e[0])
-# print(f[0])
