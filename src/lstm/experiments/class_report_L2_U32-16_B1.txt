@@ -1,0 +1,21 @@
+Experiment Configuration: L2_U32-16_B1
+Seed: 50
+Layers: 2
+Units: [32, 16]
+Bidirectional: True
+Epochs trained: 15
+Final Results:
+Loss: 1.2317
+Accuracy: 0.6225
+Macro F1: 0.6242
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.54      0.56      0.55       153
+           1       0.63      0.62      0.63        96
+           2       0.70      0.68      0.69       151
+
+    accuracy                           0.62       400
+   macro avg       0.63      0.62      0.62       400
+weighted avg       0.62      0.62      0.62       400
