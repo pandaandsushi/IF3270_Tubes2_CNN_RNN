@@ -3,9 +3,8 @@ import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 import matplotlib.pyplot as plt
-from sklearn.metrics import f1_score, classification_report
+from sklearn.metrics import f1_score
 from utils.data_loader import DataLoader
-import os
 import pickle
 
 class CNNKeras:
@@ -23,11 +22,6 @@ class CNNKeras:
         print(f"  Training: {self.x_train.shape} - {len(self.y_train)} samples")
         print(f"  Validation: {self.x_val.shape} - {len(self.y_val)} samples") 
         print(f"  Test: {self.x_test.shape} - {len(self.y_test)} samples")
-        
-        # # Verify the 4:1 ratio (40k:10k:10k)
-        # assert len(self.y_train) == 40000, f"Expected 40k train samples, got {len(self.y_train)}"
-        # assert len(self.y_val) == 10000, f"Expected 10k val samples, got {len(self.y_val)}"
-        # assert len(self.y_test) == 10000, f"Expected 10k test samples, got {len(self.y_test)}"
         
     def base_model(self, num_conv_layers=2, filters=[32, 64], kernel_sizes=[3, 3], pooling_type='max'):
         model = keras.Sequential()
@@ -116,7 +110,7 @@ class CNNKeras:
         
         results = {}
         for num_layers, filters, kernels, name in configs:
-            model = self.create_base_model(num_layers, filters, kernels, 'max')
+            model = self.base_model(num_layers, filters, kernels, 'max')
             results[name] = self.train_and_evaluate(model, name, epochs)
         
         self.plot_comparison(results, "Number of Convolutional Layers")
@@ -136,7 +130,7 @@ class CNNKeras:
         
         results = {}
         for filters, name in configs:
-            model = self.create_base_model(2, filters, [3, 3], 'max')
+            model = self.base_model(2, filters, [3, 3], 'max')
             results[name] = self.train_and_evaluate(model, name, epochs)
         
         self.plot_comparison(results, "Number of Filters")
@@ -156,7 +150,7 @@ class CNNKeras:
         
         results = {}
         for kernels, name in configs:
-            model = self.create_base_model(2, [32, 64], kernels, 'max')
+            model = self.base_model(2, [32, 64], kernels, 'max')
             results[name] = self.train_and_evaluate(model, name, epochs)
         
         self.plot_comparison(results, "Kernel Sizes")
@@ -175,7 +169,7 @@ class CNNKeras:
         
         results = {}
         for pooling, name in configs:
-            model = self.create_base_model(2, [32, 64], [3, 3], pooling)
+            model = self.base_model(2, [32, 64], [3, 3], pooling)
             results[name] = self.train_and_evaluate(model, name, epochs)
         
         self.plot_comparison(results, "Pooling Types")
@@ -244,7 +238,6 @@ class CNNKeras:
         print(f"- Performa terburuk: {worst[0]} (F1-Score: {worst[1]['f1_score']:.4f})")
     
     def analyze_filters(self, results):
-        """Analyze filters experiment"""
         print(f"\n{'='*60}")
         print("ANALISIS: PENGARUH BANYAK FILTER PER LAYER")
         print(f"{'='*60}")
@@ -316,7 +309,6 @@ class CNNKeras:
         return all_results
     
     def print_overall_summary(self, all_results):
-        """Print overall summary of all experiments"""
         print(f"\n{'#'*80}")
         print("RINGKASAN KESELURUHAN EKSPERIMEN")
         print(f"{'#'*80}")
@@ -342,19 +334,15 @@ class CNNKeras:
             print(f"- {model_name}.h5")
 
 def main():
-    """Main function to run CNN experiments"""
     print("="*80)
     print("CNN HYPERPARAMETER EXPERIMENTS - CIFAR-10")
     print("="*80)
     
-    # Set random seeds for reproducibility
     np.random.seed(42)
     tf.random.set_seed(42)
     
-    # Initialize experiments
     experiments = CNNKeras()
     
-    # Run all experiments
     results = experiments.run_all_experiments(epochs=20)
 
 if __name__ == "__main__":

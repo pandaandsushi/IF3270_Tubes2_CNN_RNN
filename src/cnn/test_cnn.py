@@ -172,7 +172,6 @@ class CNNTester:
             print(f"   Please check the implementation for debugging.")
 
 def quick_test():
-    """Quick test with a simple model"""
     print("="*60)
     print("QUICK TEST - Creating and testing a simple model")
     print("="*60)
@@ -227,8 +226,6 @@ def quick_test():
 def main():
     print("="*80)
     print("CNN FROM SCRATCH - FINAL VALIDATION")
-    print("="*80)
-    print("Using your DenseLayer implementation from Tubes 1")
     print("="*80)
     
     # Quick test first
