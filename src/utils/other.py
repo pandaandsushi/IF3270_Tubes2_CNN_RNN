@@ -59,58 +59,50 @@ class LossFunction:
 
         return loss
 
-class Derivative:
+# class Derivative:
     
 
-    @staticmethod
-    def linear(x):
-        return np.ones_like(x)
+#     @staticmethod
+#     def linear(x):
+#         return np.ones_like(x)
     
-    @staticmethod
-    def relu(x):
-        return np.where(x > 0, 1, 0)
+#     @staticmethod
+#     def relu(x):
+#         return np.where(x > 0, 1, 0)
     
-    @staticmethod
-    def sigmoid(x):
-        s = ActivationFunction.sigmoid(x)
-        return s * (1 - s)
+#     @staticmethod
+#     def sigmoid(x):
+#         s = ActivationFunction.sigmoid(x)
+#         return s * (1 - s)
     
-    @staticmethod
-    def tanh(x):
-        return 1 - np.tanh(x)**2
+#     @staticmethod
+#     def tanh(x):
+#         return 1 - np.tanh(x)**2
     
-    @staticmethod
-    def softmax(x):
-        s = ActivationFunction.softmax(x)  
-        batch_size, num_classes = s.shape
+#     @staticmethod
+#     def softmax(x):
+#         s = ActivationFunction.softmax(x)  
+#         batch_size, num_classes = s.shape
 
-        # Buat matriks turunan untuk setiap sampel dalam batch
-        jacobian = np.zeros((batch_size, num_classes, num_classes))
+#         # Buat matriks turunan untuk setiap sampel dalam batch
+#         jacobian = np.zeros((batch_size, num_classes, num_classes))
 
-        for i in range(batch_size):
-            s_i = s[i].reshape(-1, 1)
-            jacobian[i] = np.diagflat(s_i) - np.dot(s_i, s_i.T)
+#         for i in range(batch_size):
+#             s_i = s[i].reshape(-1, 1)
+#             jacobian[i] = np.diagflat(s_i) - np.dot(s_i, s_i.T)
 
-        return jacobian  
+#         return jacobian  
     
-    # Bonus: Swish, softplus, and ELU
-    @staticmethod
-    def swish(x):
-        s = ActivationFunction.sigmoid(x)
-        return s + x * s * (1 - s)
+#     # Bonus: Swish, softplus, and ELU
+#     @staticmethod
+#     def swish(x):
+#         s = ActivationFunction.sigmoid(x)
+#         return s + x * s * (1 - s)
     
-    @staticmethod
-    def softplus(x):
-        return 1 / (1 + np.exp(-x))
+#     @staticmethod
+#     def softplus(x):
+#         return 1 / (1 + np.exp(-x))
     
-    @staticmethod
-    def elu(x, alpha=1.0):
-        return np.where(x > 0, 1, alpha * np.exp(x))
-
-class RMSNorm:
-    def __init__(self, dim):
-        self.dim = dim
-        self.scale = np.ones((1, dim))
-    def __call__(self, x):
-        rms = np.sqrt(np.mean(np.square(x), axis=-1, keepdims=True))
-        return self.scale * (x / rms)
+#     @staticmethod
+#     def elu(x, alpha=1.0):
+#         return np.where(x > 0, 1, alpha * np.exp(x))
