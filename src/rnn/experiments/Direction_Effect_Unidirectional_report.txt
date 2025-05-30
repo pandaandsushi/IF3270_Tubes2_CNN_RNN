@@ -1,26 +1,26 @@
 Experiment: Direction_Effect - Unidirectional
 Configuration:
-  Layers: 2
-  Units: [64, 32]
+  Layers: 1
+  Units: [64]
   Bidirectional: False
   Epochs: 10
   Batch Size: 32
   Dropout Rate: 0.2
 
 Results:
-  Test F1 Score: 0.5551
-  Final Train Loss: 0.0202
-  Final Val Loss: 1.3630
-  Final Train Acc: 1.0000
-  Final Val Acc: 0.6200
+  Test F1 Score: 0.5052
+  Final Train Loss: 0.0969
+  Final Val Loss: 1.1264
+  Final Train Acc: 0.9840
+  Final Val Acc: 0.6000
 
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.57      0.68      0.62       153
-           1       0.55      0.34      0.42        96
-           2       0.61      0.64      0.62       151
+           0       0.51      0.71      0.60       153
+           1       0.32      0.20      0.24        96
+           2       0.74      0.62      0.68       151
 
-    accuracy                           0.58       400
-   macro avg       0.58      0.55      0.56       400
-weighted avg       0.58      0.58      0.57       400
+    accuracy                           0.56       400
+   macro avg       0.52      0.51      0.51       400
+weighted avg       0.55      0.56      0.54       400

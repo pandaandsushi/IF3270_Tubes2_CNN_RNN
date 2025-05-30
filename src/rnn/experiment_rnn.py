@@ -379,8 +379,8 @@ units_experiments = [
 
 # 3. Pengaruh arah RNN (2 variasi)
 direction_experiments = [
-    {"name": "Unidirectional", "layers": 2, "units": [64, 32], "bidirectional": False},
-    {"name": "Bidirectional", "layers": 2, "units": [64, 32], "bidirectional": True}
+    {"name": "Unidirectional", "layers": 1, "units": [64], "bidirectional": False},
+    {"name": "Bidirectional", "layers": 1, "units": [64], "bidirectional": True}
 ]
 
 # Combine all experiments
