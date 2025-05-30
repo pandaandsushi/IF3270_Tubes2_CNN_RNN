@@ -26,6 +26,15 @@ pip install -r requirements.txt
 
 #### CNN
 
+Untuk melatih model menggunakan Keras dan scratch dan membandingkan F1 score, bisa dijalankan melalui link colab di bawah ini
+```bash
+https://colab.research.google.com/drive/18Pr0uCWYzHRKxsmp3NlqdK2vfkdG_gTf?usp=sharing
+```
+atau langsung menjalankan notebook yang terdapat pada path berikut
+```bash
+src/cnn/13522012_13522046_13522096_CNN_Testing.ipynb
+```
+
 #### Simple RNN
 
 Untuk melatih model menggunakan Keras dan scratch dan membandingkan F1 score, jalankan:
