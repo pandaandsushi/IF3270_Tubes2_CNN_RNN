@@ -1,20 +1,21 @@
 Experiment Configuration: L2_U64-32_B0
+Seed: 43
 Layers: 2
 Units: [64, 32]
 Bidirectional: False
 Epochs trained: 15
 Final Results:
-Loss: 1.1227
-Accuracy: 0.3825
-Macro F1: 0.1844
+Loss: 1.0972
+Accuracy: 0.5350
+Macro F1: 0.5056
 
 Classification Report:
               precision    recall  f1-score   support
 
-           0       0.38      1.00      0.55       153
-           1       0.00      0.00      0.00        96
-           2       0.00      0.00      0.00       151
+           0       0.40      0.15      0.22       153
+           1       0.41      0.85      0.55        96
+           2       0.77      0.72      0.75       151
 
-    accuracy                           0.38       400
-   macro avg       0.13      0.33      0.18       400
-weighted avg       0.15      0.38      0.21       400
+    accuracy                           0.54       400
+   macro avg       0.53      0.58      0.51       400
+weighted avg       0.54      0.54      0.50       400

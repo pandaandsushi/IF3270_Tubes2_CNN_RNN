@@ -6,10 +6,17 @@ import numpy as np
 import tensorflow as tf
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
-from utils.layers import EmbeddingLayer, LSTMCell, DenseLayer
+from utils.layers import EmbeddingLayer, LSTMCell, DenseLayer, DropoutLayer
 from utils.metrics import f1_score_macro, print_classification_report
 from utils.data_loader import DataLoader
 from utils.tokenizer import TextPreprocessor
+import random
+
+# Set seeds
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+random.seed(SEED)
 
 # Configuration
 DATASET       = "NusaX"
@@ -115,10 +122,18 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
     """
     Perform forward propagation through the custom LSTM model.
     """
+    np.random.seed(SEED)
+    
     N, seq_len = X.shape
     H = emb.forward(X)
     
-    current_output = H
+    mask = (X != 0)
+    print(f"Mask shape: {mask.shape}")
+    print(f"Mask sample (first sequence): {mask[0]}")
+    
+    dropout_layer = DropoutLayer(rate=0.3)
+    dropout_layer.setis_training(False)
+    current_output = dropout_layer.forward(H)
     
     for i, cell in enumerate(lstm_cells):
         if isinstance(cell, dict) and cell.get('is_bidirectional', False):
@@ -141,14 +156,44 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
             # forward pass
             for t in range(seq_len):
                 x_t = current_output[:, t, :]
-                h_f, c_f = forward_cell.forward(x_t, h_f, c_f)
-                forward_outputs.append(h_f)
+                
+                active_mask = mask[:, t]
+                if active_mask.any():
+                    active_indices = np.where(active_mask)[0]
+                    
+                    if len(active_indices) == N:
+                        h_f, c_f = forward_cell.forward(x_t, h_f, c_f)
+                    else:
+                        h_active, c_active = forward_cell.forward(
+                            x_t[active_indices], 
+                            h_f[active_indices], 
+                            c_f[active_indices]
+                        )
+                        h_f[active_indices] = h_active
+                        c_f[active_indices] = c_active
+                
+                forward_outputs.append(h_f.copy())
             
             # backward pass
             for t in range(seq_len-1, -1, -1):
                 x_t = current_output[:, t, :]
-                h_b, c_b = backward_cell.forward(x_t, h_b, c_b)
-                backward_outputs.append(h_b)
+                
+                active_mask = mask[:, t]
+                if active_mask.any():
+                    active_indices = np.where(active_mask)[0]
+                    
+                    if len(active_indices) == N:
+                        h_b, c_b = backward_cell.forward(x_t, h_b, c_b)
+                    else:
+                        h_active, c_active = backward_cell.forward(
+                            x_t[active_indices], 
+                            h_b[active_indices], 
+                            c_b[active_indices]
+                        )
+                        h_b[active_indices] = h_active
+                        c_b[active_indices] = c_active
+                
+                backward_outputs.append(h_b.copy())
             
             backward_outputs = backward_outputs[::-1]
             
@@ -175,8 +220,23 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
             outputs = []
             for t in range(seq_len):
                 x_t = current_output[:, t, :]
-                h, c = cell.forward(x_t, h, c)
-                outputs.append(h)
+                
+                active_mask = mask[:, t]
+                if active_mask.any():
+                    active_indices = np.where(active_mask)[0]
+                    
+                    if len(active_indices) == N:
+                        h, c = cell.forward(x_t, h, c)
+                    else:
+                        h_active, c_active = cell.forward(
+                            x_t[active_indices], 
+                            h[active_indices], 
+                            c[active_indices]
+                        )
+                        h[active_indices] = h_active
+                        c[active_indices] = c_active
+                
+                outputs.append(h.copy())
             
             if i == len(lstm_cells) - 1:
                 current_output = outputs[-1]
@@ -184,6 +244,17 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
             else:
                 current_output = np.stack(outputs, axis=1)
                 print(f"  Intermediate output shape: {current_output.shape}")
+        
+        dropout_layer = DropoutLayer(rate=0.4)
+        dropout_layer.setis_training(False)
+        if i == len(lstm_cells) - 1:
+            current_output = dropout_layer.forward(current_output)
+        else:
+            pass
+    
+    dropout_layer = DropoutLayer(rate=0.5)
+    dropout_layer.setis_training(False)
+    current_output = dropout_layer.forward(current_output)
     
     print(f"Before intermediate dense layer: {current_output.shape}")
     current_output = intermediate_dense.forward(current_output)
@@ -192,6 +263,15 @@ def scratch_forward(emb, lstm_cells, intermediate_dense, dense, X):
     print(f"Before output dense layer: {current_output.shape}")
     y_prob = dense.forward(current_output)
     print(f"After output dense layer: {y_prob.shape}")
+    
+    # temperature = 1.1
+    # y_prob = y_prob ** (1/temperature)
+    # y_prob = y_prob / np.sum(y_prob, axis=1, keepdims=True)
+    
+    # class_boost = np.array([1.05, 1.0, 1.0])
+    # y_prob = y_prob * class_boost
+    # y_prob = y_prob / np.sum(y_prob, axis=1, keepdims=True)
+    
     return y_prob
 
 def main():
@@ -200,8 +280,8 @@ def main():
     loader = DataLoader(DATASET)
     x_tr_raw, x_val_raw, x_te_raw, y_tr, y_val, y_te = loader.load_data()
 
-    x_tr_txt = x_tr_raw[:, 0].astype(str)
-    x_te_txt = x_te_raw[:, 0].astype(str)
+    x_tr_txt = x_tr_raw[:, 1].astype(str)
+    x_te_txt = x_te_raw[:, 1].astype(str)
 
     # label conversion
     if y_te.dtype == 'object' or y_te.dtype.kind in {'U', 'S'}:

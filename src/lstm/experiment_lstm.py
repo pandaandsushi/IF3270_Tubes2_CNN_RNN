@@ -4,6 +4,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import numpy as np
 import pandas as pd
+import tensorflow as tf
 from sklearn.metrics import classification_report
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils.class_weight import compute_class_weight
@@ -11,6 +12,13 @@ from utils.data_loader import DataLoader
 from utils.tokenizer import TextPreprocessor
 from utils.metrics import f1_score_macro, print_classification_report, plot_history
 import train_lstm
+import random
+
+# Set seeds
+SEED = 42
+np.random.seed(SEED)
+tf.random.set_seed(SEED)
+random.seed(SEED)
 
 print("Starting LSTM experiments...")
 
@@ -44,9 +52,9 @@ print("Loading NusaX dataset...")
 loader = DataLoader(DATASET)
 x_tr_raw, x_val_raw, x_te_raw, y_tr, y_val, y_te = loader.load_data()
 
-x_tr_txt = x_tr_raw[:, 0].astype(str)
-x_val_txt = x_val_raw[:, 0].astype(str)
-x_te_txt = x_te_raw[:, 0].astype(str)
+x_tr_txt = x_tr_raw[:, 1].astype(str)
+x_val_txt = x_val_raw[:, 1].astype(str)
+x_te_txt = x_te_raw[:, 1].astype(str)
 
 if y_tr.dtype == 'object' or y_tr.dtype.kind in {'U', 'S'}:
     print("Converting string labels to numeric...")
@@ -84,17 +92,24 @@ print("Class weights:", class_weight_dict)
 
 # --- Experiment loop ---
 results = []
-for cfg in param_grid:
+for experiment_idx, cfg in enumerate(param_grid):
+    # reset seeds for each experiment
+    experiment_seed = SEED + experiment_idx
+    np.random.seed(experiment_seed)
+    tf.random.set_seed(experiment_seed)
+    random.seed(experiment_seed)
+    
     layers = cfg["layers"]
     units = cfg["units"]
     bidi_flag = cfg["bidirectional"]
     tag = f"L{layers}_U{'-'.join(map(str,units))}_B{int(bidi_flag)}"
-    print(f"\n=== Running experiment: {tag} ===")
+    print(f"\n=== Running experiment: {tag} (seed: {experiment_seed}) ===")
 
     # Override hyperparams in train_lstm
     train_lstm.LSTM_LAYERS = layers
     train_lstm.LSTM_UNITS = units
     train_lstm.BIDIRECTIONAL = bidi_flag
+    train_lstm.SEED = experiment_seed
 
     # Build & train model
     model = train_lstm.build_lstm_model(vocab_size, num_classes)
@@ -149,6 +164,7 @@ for cfg in param_grid:
     cr_path = os.path.join(save_dir, f"class_report_{tag}.txt")
     with open(cr_path, "w") as f:
         f.write(f"Experiment Configuration: {tag}\n")
+        f.write(f"Seed: {experiment_seed}\n")
         f.write(f"Layers: {layers}\n")
         f.write(f"Units: {units}\n")
         f.write(f"Bidirectional: {bidi_flag}\n")
@@ -164,6 +180,7 @@ for cfg in param_grid:
     # Collect results
     results.append({
         "config": tag,
+        "seed": experiment_seed,
         "layers": layers,
         "units": "-".join(map(str, units)),
         "bidirectional": int(bidi_flag),
@@ -183,4 +200,4 @@ df = df.sort_values('macro_f1', ascending=False)
 df.to_csv(csv_path, index=False)
 print(f"\nAll experiments completed. Summary saved to {csv_path}")
 print("\nTop 3 configurations by Macro F1:")
-print(df[['config', 'accuracy', 'macro_f1']].head(3))
+print(df[['config', 'seed', 'accuracy', 'macro_f1']].head(3))
