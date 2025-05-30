@@ -28,6 +28,18 @@ pip install -r requirements.txt
 
 #### Simple RNN
 
+Untuk melatih model menggunakan Keras dan scratch dan membandingkan F1 score, jalankan:
+```bash
+python src/rnn/train_rnn.py  
+```
+Untuk melakukan eksperimen dengan beberapa hyperparameter, jalankan:
+```bash
+python src/rnn/experiment_rnn.py
+```
+Hasil evaluasi akan disimpan di `src/rnn/experiments/`.
+
+---
+
 #### LSTM
 
 Untuk melatih model menggunakan Keras, jalankan:
